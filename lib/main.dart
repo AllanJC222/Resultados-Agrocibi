@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-// Importaciones de widgets personalizados para popups y navegación
 import 'popip_muestra.dart'; 
-// Sistema centralizado de datos de la aplicación
 import 'sistema_datos.dart';
 import 'app_bar.dart';
-import 'navigation_helper.dart';
+import 'popup_analisis_wizard.dart';
+import 'route.dart'; // Importa el archivo de rutas
 
 
-/// Constantes de colores para mantener consistencia visual
-/// Centraliza la paleta de colores evitando magic numbers
+
 class AppColors {
   static const Color primary = Color.fromRGBO(233, 99, 43, 1);
   static const Color secondary = Color.fromRGBO(243, 202, 11, 1);
@@ -50,7 +48,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.orange,
         fontFamily: 'Roboto',
       ),
-      home: const MyHomePage(title: AppStrings.appTitle),
+      initialRoute: '/', // Define la ruta inicial
+      onGenerateRoute: RouteGenerator.generateRoute,
     );
     
   }
@@ -59,9 +58,8 @@ class MyApp extends StatelessWidget {
 /// Página principal que muestra los resultados de análisis de hongos y bacterias
 /// Maneja el estado de las variantes analizadas y su presencia/ausencia
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key});
 
-  final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -418,30 +416,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  /// Maneja el flujo de selección de nuevo análisis
-  /// 1. Muestra menú de tipos de análisis
-  /// 2. Muestra métodos disponibles para el análisis seleccionado  
-  /// 3. Navega a pantalla de variantes del método elegido
-  void _showAnalisisMenu() async {
-  // En lugar de toda la lógica que tenías antes, ahora solo:
-  await NavigationHelper.showAnalisisFlow(
-    context,
-    onMainRefresh: () {
-      // Esta función se ejecuta si necesita refrescar el main
-      setState(() {
-        _initializeResults(); // Tu función existente
-      });
-    },
+  _showAnalisisMenu() {
+  showDialog(
+    context: context,
+    builder: (_) => AnalisisWizardPopup(),
   );
 }
 
   
 
 }
-// NOTAS DE MEJORAS IDENTIFICADAS:
-// 1. El título 'Login de usuario' no coincide con la funcionalidad
-// 2. Falta implementar navegación del botón back
-// 3. Falta implementar menú lateral
-// 4. El método _getAnalyzedCount no se usa actualmente
-// 5. Considerar extraer constantes para IDs de métodos (5, 6)
-// 6. Añadir validación de datos nulos del SistemaDato

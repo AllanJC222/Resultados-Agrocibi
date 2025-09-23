@@ -82,7 +82,7 @@ class SistemaDatos {
     
     // Métodos de Bacteriología (id_analisis = 4)
     Metodo(idMetodo: 6, nombre: "Convencional", idAnalisis: 4),
-    Metodo(idMetodo: 7, nombre: "PCR (hongos)", idAnalisis: 4),
+    Metodo(idMetodo: 7, nombre: "PCR", idAnalisis: 4),
     Metodo(idMetodo: 8, nombre: "Prueba Rápida AGDIA", idAnalisis: 4),
     
     // Métodos de Nutrición (id_analisis = 5)
@@ -150,13 +150,14 @@ class SistemaDatos {
     // Variantes Multi-Ion - Nutrición (id_metodo = 9)
     Variante(idVariante: 42, nombre: "Iones/Cationes", idMetodo: 9),
   ];
-  final int tipoMuestra = 2; // 1: Tejido , 2: Suelo, 3: Agua
+
+
+  final int tipoMuestra = 1; // 1: Tejido , 2: Suelo, 3: Agua
   static final Map<String, dynamic> muestra = {
     "id": 2,
     "codigo": "M-2025-001",
     "tipo": "Tejido foliar",
     "tipoMuestraId": 2,
- // 1: Tejido , 2: Suelo, 3: Agua
     "analisis": "Hongos / Bacterias",
     "finca": "Finca El Progreso",
     "ubicacionTecnica": "Lote 12, Sector Norte",

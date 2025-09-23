@@ -162,7 +162,6 @@ class MuestraPopup extends StatelessWidget {
                     
                     // ========================================
                     // SUBSECCIÓN 2.4: IDENTIFICACIÓN
-                    // ========================================
                     
                     _buildInfoSection("Identificación", [
                       _buildInfoItem("Identificación de la muestra:", muestra['identificacion']),
@@ -324,82 +323,3 @@ class MuestraPopup extends StatelessWidget {
     );
   }
 }
-
-// NOTAS PARA IMPLEMENTACIÓN DE API
-
-/*
-ENDPOINT NECESARIO:
-
-GET /muestras/{id}/detalles
-Response: {
-  "codigo": "M-2025-001",
-  "tipo": "Tejido foliar", 
-  "analisis": "Hongos / Bacterias",
-  "finca": "Finca El Progreso",
-  "ubicacionTecnica": "Lote 12, Sector Norte",
-  "temporada": "2025",
-  "turno": "Mañana",
-  "valvula": "Válvula #7",
-  "longitud": "-87.175",
-  "latitud": "14.084",
-  "fechaMuestreo": "01/09/2025",
-  "fechaEnvio": "02/09/2025", 
-  "fechaResultados": "04/09/2025",
-  "identificacion": "Hoja afectada con manchas amarillas",
-  "observaciones": "La muestra fue recolectada en condiciones secas..."
-}
-
-CONSIDERACIONES PARA API:
-
-1. MANEJO DE CAMPOS NULOS:
-   - El widget maneja campos null automáticamente
-   - Muestra "No disponible" para datos faltantes
-   - API puede enviar null o omitir campos opcionales
-
-2. FORMATO DE FECHAS:
-   - Actualmente espera strings formateados (DD/MM/AAAA)
-   - Considerar usar formato ISO 8601 y formatear en cliente
-   - Ejemplo: "2025-09-01T00:00:00Z" → "01/09/2025"
-
-3. OBSERVACIONES LARGAS:
-   - El widget soporta texto multi-línea automáticamente
-   - Sin límite de caracteres en el diseño
-   - API puede enviar texto completo sin truncar
-
-4. COORDENADAS GPS:
-   - Actualmente son strings, considerar usar números
-   - Ejemplo: "latitud": -87.175 en lugar de "-87.175"
-   - Facilita cálculos geográficos si se necesitan
-
-MEJORAS FUTURAS:
-
-2. LINKS INTERACTIVOS:
-   - Hacer coordenadas GPS clickeables (abrir Maps)
-   - Links a sistemas externos por código de muestra
-
-4. HISTORIAL:
-   - Mostrar cambios/actualizaciones de la muestra
-   - Timeline de estados de la muestra
-
-ESTRUCTURA DE DATOS:
-
-El widget es completamente flexible con la estructura de datos:
-- Acepta cualquier Map<String, dynamic>
-- Maneja valores null automáticamente  
-- Fácil agregar nuevos campos sin cambiar código
-- Compatible con JSON de APIs REST
-
-PERFORMANCE:
-
-- Widget ligero, solo muestra datos
-- SingleChildScrollView maneja listas largas eficientemente
-- No hay operaciones costosas o llamadas a API
-- Se puede mostrar inmediatamente con datos cached
-
-ACCESIBILIDAD:
-
-- Textos legibles con contraste adecuado
-- Tamaños de fuente apropiados
-- Estructura semántica clara
-- Compatible con lectores de pantalla
-*/

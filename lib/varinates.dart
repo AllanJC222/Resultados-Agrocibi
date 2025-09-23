@@ -253,200 +253,177 @@ class _VariantesState extends State<Variantes> {
     );
   }
 
-  /// LÓGICA CENTRAL: Construye formulario dinámico basado en análisis, método y tipo de muestra
-  /// Implementa matriz completa según tabla de especificaciones:
-  /// VIRUS: ELISA/PCR (presencia+absorbancia), Prueba Rápida (solo presencia)
-  /// NEMATODOS: Centrifugación (juveniles) - solo tejido/suelo
-  /// HONGOS: Convencional - tejido(presencia), suelo(conteo), agua(conteo+presencia)  
-  /// BACTERIOLOGÍA: Convencional, PCR, Prueba Rápida con campos específicos
   Widget _buildDynamicInputSection() {
-    final analisis = SistemaDatos.getAnalisisPorId(widget.metodo.idAnalisis);
-    final int idAnalisis = analisis?.idAnalisis ?? 0;
-    final int idMetodo = widget.metodo.idMetodo;
-    
-    // 🔥 CÓDIGO NUEVO: Obtener tipo de muestra como INT
-    int tipoMuestraId = 3;
-    
-    // Función para obtener el tipo lógico basado en la matriz
-    int _getTipoLogico(int tipoId, int idAnalisis, int idMetodo) {
-      // 1=Tejido, 2=Suelo, 3=Agua, 4=Semilla
-      
-      if (tipoId == 4) { // Semilla
-        // Reglas especiales para semilla según tu matriz:
-        if (idAnalisis == 1) return 1; // Virus: se toma como tejido
-        if (idAnalisis == 2) return 1; // Nematodos: se toma como tejido  
-        if (idAnalisis == 3) return 1; // Hongos: se toma como tejido
-        if (idAnalisis == 4) return 4; // Bacteriología: mantiene como semilla
+  final int idAnalisis = widget.metodo.idAnalisis;
+  final int idMetodo = widget.metodo.idMetodo;
+  final int tipoMuestraId = 2; // 1: Tejido, 2: Suelo, 3: Semilla
+  
+  final List<Widget> inputWidgets = [];
+
+  // VIRUS
+  if (idAnalisis == 1) {
+    if (idMetodo == 1 || idMetodo == 2) { // ELISA o PCR
+      inputWidgets.add(_buildPresenciaSection());
+      inputWidgets.add(const SizedBox(height: 20));
+      inputWidgets.add(Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Text(
+        "Absorbancia / CT",  // <-- El único cambio, ahora es dinámico
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 12),
+      TextFormField(
+        controller: _absorbanciaCtController,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          contentPadding: const EdgeInsets.all(16),
+          hintText: 'Ingresar valor numérico',
+        ),
+        keyboardType: TextInputType.number,
+      ),
+    ],
+  ));
+    } else if (idMetodo == 3) { // Prueba Rápida
+      inputWidgets.add(_buildPresenciaSection());
+    }
+  }
+  
+  // NEMATODOS
+  else if (idAnalisis == 2 && idMetodo == 4) { // Centrifugación
+    if (tipoMuestraId == 1 || tipoMuestraId == 2) { // Tejido o Suelo
+      inputWidgets.add(Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Text(
+        "Juveniles por gramos de suelo",  // <-- El único cambio, ahora es dinámico
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 12),
+      TextFormField(
+        controller: _juvenilesController,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          contentPadding: const EdgeInsets.all(16),
+          hintText: 'Ingresar valor numérico',
+        ),
+        keyboardType: TextInputType.number,
+      ),
+    ],
+  ));
+    } else if (tipoMuestraId == 3) { // Semilla
+      inputWidgets.add(_buildNoAplicaMessage('Nematodos no se analizan en semillas'));
+    }
+  }
+  
+  // HONGOS  
+  else if (idAnalisis == 3 && idMetodo == 5) { // Convencional
+    if (tipoMuestraId == 1 || tipoMuestraId == 3) { // Tejido o Semilla
+      inputWidgets.add(_buildPresenciaSection());
+    } else if (tipoMuestraId == 2) { // Suelo
+      inputWidgets.add(Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Text(
+        "Conteo",  // <-- El único cambio, ahora es dinámico
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 12),
+      TextFormField(
+        controller: _conteoController,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          contentPadding: const EdgeInsets.all(16),
+          hintText: 'Ingresar valor numérico',
+        ),
+        keyboardType: TextInputType.number,
+      ),
+    ],
+  ));
+    }
+  }
+  
+  // BACTERIOLOGÍA
+  else if (idAnalisis == 4) {
+    if (idMetodo == 6) { // Convencional
+      if (tipoMuestraId == 1) { // Tejido
+        inputWidgets.add(_buildPresenciaSection());
+      } else if (tipoMuestraId == 2) { // Suelo
+        inputWidgets.add(_buildNoAplicaMessage('Bacteriología convencional no aplica para suelo'));
+      } else if (tipoMuestraId == 3) { // Semilla
+        inputWidgets.add(_buildPresenciaSection());
+        inputWidgets.add(const SizedBox(height: 20));
+        inputWidgets.add(Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Text(
+        "Conteo",  // <-- El único cambio, ahora es dinámico
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 12),
+      TextFormField(
+        controller: _conteoController,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          contentPadding: const EdgeInsets.all(16),
+          hintText: 'Ingresar valor numérico',
+        ),
+        keyboardType: TextInputType.number,
+      ),
+    ],
+  ));
+        inputWidgets.add(const SizedBox(height: 20));
+        inputWidgets.add(_buildDilucionSection());
       }
-      
-      return tipoId; // Para tejido, suelo, agua: sin cambios
-    }
-    
-    int tipoLogicoId = _getTipoLogico(tipoMuestraId, idAnalisis, idMetodo);
-    
-    // Helper para nombres de tipos (solo para debug/display)
-    String _getNombreTipo(int id) {
-      switch (id) {
-        case 1: return 'Tejido';
-        case 2: return 'Suelo';
-        case 3: return 'Agua';
-        case 4: return 'Semilla';
-        default: return 'Desconocido';
+    } 
+    else if (idMetodo == 7) { // PCR
+      if (tipoMuestraId == 1) { // Tejido
+        inputWidgets.add(_buildPresenciaSection());
+      } else if (tipoMuestraId == 2) { // Suelo  
+        inputWidgets.add(_buildNoAplicaMessage('PCR no aplica para suelo'));
+      } else if (tipoMuestraId == 3) { // Semilla
+        inputWidgets.add(_buildPresenciaSection());
+        inputWidgets.add(const SizedBox(height: 20));
+        inputWidgets.add(Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Text(
+        "Valor Numérico",  // <-- El único cambio, ahora es dinámico
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 12),
+      TextFormField(
+        controller: _conteoController,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          contentPadding: const EdgeInsets.all(16),
+          hintText: 'Ingresar valor numérico',
+        ),
+        keyboardType: TextInputType.number,
+      ),
+    ],
+  ));
+      }
+    } 
+    else if (idMetodo == 8) { // Prueba Rápida
+      if (tipoMuestraId == 1 || tipoMuestraId == 3) { // Tejido o Semilla
+        inputWidgets.add(_buildPresenciaSection());
+      } else if (tipoMuestraId == 2) { // Suelo
+        inputWidgets.add(_buildNoAplicaMessage('Prueba rápida no aplica para suelo'));
       }
     }
-    
-    // DEBUG
-    print('=== MATRIZ CON INT ===');
-    print('Tipo original: $tipoMuestraId (${_getNombreTipo(tipoMuestraId)})');
-    print('Tipo lógico: $tipoLogicoId (${_getNombreTipo(tipoLogicoId)})');
-    print('Análisis: $idAnalisis, Método: $idMetodo');
-    print('=====================');
-    
-    final List<Widget> inputWidgets = [];
-
-    // 🔥 SWITCH CON LÓGICA INT
-    switch (idAnalisis) {
-      case 1: // VIRUS
-        print('🦠 VIRUS - Todos los tipos iguales');
-        if (idMetodo == 1 || idMetodo == 2) { // ELISA o PCR
-          inputWidgets.addAll([
-            _buildPresenciaSection(),
-            const SizedBox(height: 20),
-            _buildAbsorbanciaCtSection(),
-          ]);
-        } else if (idMetodo == 3) { // Prueba Rápida
-          inputWidgets.add(_buildPresenciaSection());
-        }
-        
-        // Nota especial si es semilla
-        if (tipoMuestraId == 4) {
-          inputWidgets.insert(0, _buildInfoNote('Las semillas se procesan como tejido para virus'));
-          inputWidgets.insert(1, const SizedBox(height: 12));
-        }
-        break;
-        
-      case 2: // NEMATODOS
-        print('🪱 NEMATODOS');
-        if (idMetodo == 4) { // Centrifugación
-          if (tipoLogicoId == 1 || tipoLogicoId == 2) { // Tejido o Suelo (incluye semilla→tejido)
-            inputWidgets.add(_buildJuvenilesSection());
-            
-            if (tipoMuestraId == 4) {
-              inputWidgets.insert(0, _buildInfoNote('Las semillas se procesan como tejido para nematodos'));
-              inputWidgets.insert(1, const SizedBox(height: 12));
-            }
-          } else if (tipoLogicoId == 3) { // Agua
-            inputWidgets.add(_buildNoAplicaMessage('Nematodos no se analizan en muestras de agua'));
-          }
-        }
-        break;
-        
-      case 3: // HONGOS
-        print('🍄 HONGOS');
-        if (idMetodo == 5) { // Convencional
-          if (tipoLogicoId == 1) { // Tejido (incluye semilla→tejido)
-            inputWidgets.add(_buildPresenciaSection());
-            
-            if (tipoMuestraId == 4) {
-              inputWidgets.insert(0, _buildInfoNote('Las semillas se procesan como tejido para hongos'));
-              inputWidgets.insert(1, const SizedBox(height: 12));
-            }
-          } else if (tipoLogicoId == 2) { // Suelo
-            inputWidgets.add(_buildConteoSection());
-          } else if (tipoLogicoId == 3) { // Agua
-            inputWidgets.addAll([
-              _buildConteoSection(),
-              const SizedBox(height: 20),
-              _buildPresenciaSection(),
-            ]);
-          }
-        }
-        break;
-        
-      case 4: // BACTERIOLOGÍA
-        print('🧬 BACTERIOLOGÍA');
-        if (idMetodo == 6) { // Convencional
-          if (tipoLogicoId == 1) { // Tejido
-            inputWidgets.add(_buildPresenciaSection());
-          } else if (tipoLogicoId == 2) { // Suelo
-            inputWidgets.add(_buildNoAplicaMessage('Bacteriología convencional no aplica para muestras de suelo'));
-          } else if (tipoLogicoId == 3) { // Agua
-            inputWidgets.addAll([
-              _buildPresenciaSection(),
-              const SizedBox(height: 20),
-              _buildAbsorbanciaCtSection(),
-              const SizedBox(height: 20),
-              _buildDilucionSection(),
-            ]);
-          } else if (tipoLogicoId == 4) { // Semilla (caso especial)
-            inputWidgets.addAll([
-              _buildInfoNote('Análisis bacteriológico para semillas: presencia + CT + dilución'),
-              const SizedBox(height: 12),
-              _buildPresenciaSection(),
-              const SizedBox(height: 20),
-              _buildAbsorbanciaCtSection(),
-              const SizedBox(height: 20),
-              _buildDilucionSection(),
-            ]);
-          }
-        } else if (idMetodo == 7) { // PCR
-          if (tipoLogicoId == 1) { // Tejido
-            inputWidgets.add(_buildPresenciaSection());
-          } else if (tipoLogicoId == 2) { // Suelo
-            inputWidgets.add(_buildNoAplicaMessage('PCR no aplica para muestras de suelo'));
-          } else if (tipoLogicoId == 3) { // Agua
-            inputWidgets.addAll([
-              _buildPresenciaSection(),
-              const SizedBox(height: 20),
-              _buildAbsorbanciaCtSection(),
-            ]);
-          } else if (tipoLogicoId == 4) { // Semilla (caso especial)
-            inputWidgets.addAll([
-              _buildInfoNote('PCR para semillas: presencia + valor numérico'),
-              const SizedBox(height: 12),
-              _buildPresenciaSection(),
-              const SizedBox(height: 20),
-              _buildValorNumericoSection(),
-            ]);
-          }
-        } else if (idMetodo == 8) { // Prueba Rápida
-          if (tipoLogicoId == 1 || tipoLogicoId == 3 || tipoLogicoId == 4) { // Tejido, Agua, Semilla
-            inputWidgets.add(_buildPresenciaSection());
-            
-            if (tipoMuestraId == 4) {
-              inputWidgets.insert(0, _buildInfoNote('Prueba rápida para semillas: solo presencia'));
-              inputWidgets.insert(1, const SizedBox(height: 12));
-            }
-          } else if (tipoLogicoId == 2) { // Suelo
-            inputWidgets.add(_buildNoAplicaMessage('Prueba rápida no aplica para muestras de suelo'));
-          }
-        }
-        break;
-    }
-
-    // Si no hay campos disponibles
-    if (inputWidgets.isEmpty) {
-      return Column(
-        children: [
-          const Icon(Icons.info, size: 48, color: Colors.grey),
-          const SizedBox(height: 16),
-          Text(
-            'Configuración no disponible:\n'
-            '${analisis?.nombre} - ${widget.metodo.nombre}\n'
-            'Tipo de muestra: ${_getNombreTipo(tipoMuestraId)}',
-            style: const TextStyle(fontSize: 16, color: Colors.grey),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: inputWidgets,
-    );
   }
 
+  // Si no hay campos configurados
+  if (inputWidgets.isEmpty) {
+    return _buildNoAplicaMessage('No hay configuración para esta combinación');
+  }
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: inputWidgets,
+  );
+}
   // 🔥 WIDGETS NUEVOS - Agregar antes de _resetForm()
   
   /// Widget para cuando el análisis no aplica
@@ -478,58 +455,6 @@ class _VariantesState extends State<Variantes> {
               fontSize: 14,
             ),
             textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Widget para valor numérico (diferente de CT)
-  Widget _buildValorNumericoSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Text(
-          "Valor Numérico",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 12),
-        TextFormField(
-          controller: _conteoController, // Reutiliza el controlador existente
-          decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            contentPadding: const EdgeInsets.all(16),
-            hintText: 'Ingresar valor numérico',
-            labelText: 'Valor',
-          ),
-          keyboardType: TextInputType.number,
-        ),
-      ],
-    );
-  }
-
-  /// Widget de nota informativa
-  Widget _buildInfoNote(String message) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50,
-        border: Border.all(color: Colors.blue.shade200),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.info_outline, color: Colors.blue.shade600, size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              message,
-              style: TextStyle(
-                color: Colors.blue.shade700,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
           ),
         ],
       ),
@@ -568,75 +493,7 @@ class _VariantesState extends State<Variantes> {
     ),
   );
 }
-
-  /// Widget para entrada numérica de absorbancia o ciclos CT
-  Widget _buildAbsorbanciaCtSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Text(
-          "Absorbancia / CT",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 12),
-        TextFormField(
-          controller: _absorbanciaCtController,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            contentPadding: const EdgeInsets.all(16),
-            hintText: 'Ingresar valor numérico',
-          ),
-          keyboardType: TextInputType.number, // Teclado numérico
-        ),
-      ],
-    );
-  }
-
-  /// Widget para entrada numérica de conteo de organismos
-  Widget _buildConteoSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Text(
-          "Conteo",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 12),
-        TextFormField(
-          controller: _conteoController,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            contentPadding: const EdgeInsets.all(16),
-            hintText: 'Ingresar conteo',
-          ),
-          keyboardType: TextInputType.number,
-        ),
-      ],
-    );
-  }
-
-  /// Widget para entrada de juveniles por gramo (específico para nematodos)
-  Widget _buildJuvenilesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Text(
-          "Juveniles por gramos de suelo",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 12),
-        TextFormField(
-          controller: _juvenilesController,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            contentPadding: const EdgeInsets.all(16),
-            hintText: 'Ingresar valor',
-          ),
-          keyboardType: TextInputType.number,
-        ),
-      ],
-    );
-  }
+ 
 
   /// Widget dropdown para selección de dilución
   Widget _buildDilucionSection() {

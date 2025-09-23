@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'popup_tipoCapptura.dart';
-import 'navigation_helper.dart';
+import 'popup_analisis_wizard.dart';
 
 class CustomAppBar {
-  
   // Método estático para crear el AppBar con popup
   static PreferredSizeWidget buildAppBar(
-    BuildContext context, 
-    String title, 
-    {Color? appBarColor, VoidCallback? onReset}  // ← AGREGAMOS CALLBACK PARA RESET
-  ) {
+    BuildContext context,
+    String title, {
+    Color? appBarColor,
+    VoidCallback? onReset, // ← AGREGAMOS CALLBACK PARA RESET
+  }) {
     return AppBar(
       backgroundColor: appBarColor ?? Colors.blue,
       elevation: 4,
@@ -33,7 +33,11 @@ class CustomAppBar {
         IconButton(
           icon: const Icon(Icons.menu_sharp, color: Colors.white),
           onPressed: () {
-            _showMenuPopup(context, appBarColor ?? Colors.blue, onReset);  // ← PASAMOS EL CALLBACK
+            _showMenuPopup(
+              context,
+              appBarColor ?? Colors.blue,
+              onReset,
+            ); // ← PASAMOS EL CALLBACK
           },
         ),
       ],
@@ -41,10 +45,15 @@ class CustomAppBar {
   }
 
   // Método privado para mostrar el popup
-  static void _showMenuPopup(BuildContext context, Color color, VoidCallback? onReset) {  // ← RECIBIMOS EL CALLBACK
+  static void _showMenuPopup(
+    BuildContext context,
+    Color color,
+    VoidCallback? onReset,
+  ) {
+    // ← RECIBIMOS EL CALLBACK
     // GUARDAMOS EL CONTEXTO PADRE para usarlo después
     final BuildContext parentContext = context;
-    
+
     showDialog(
       context: context,
       barrierColor: Colors.black54,
@@ -94,7 +103,11 @@ class CustomAppBar {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.close, color: Colors.white, size: 18),
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                                size: 18,
+                              ),
                               onPressed: () => Navigator.pop(context),
                             ),
                           ],
@@ -108,36 +121,70 @@ class CustomAppBar {
                       ),
                       const SizedBox(height: 8),
                       // Opciones del menú
-                      _buildMenuItem(context, Icons.home, "Volver al menú principal", () {
-                        Navigator.pop(context);
-                        Navigator.popUntil(parentContext, (route) => route.isFirst);
-                      }),
-                      _buildMenuItem(context, Icons.camera_alt, "Tipo de captura", () {
-                        Navigator.pop(context);
-                        TipoCapturaPopup.show(parentContext);
-                      }),
-                      
-                      _buildMenuItem(context, Icons.add_circle, "Ingresar resultados", () async {
-                        Navigator.pop(context);
-                        await NavigationHelper.showAnalisisFlow(parentContext);
-                      }),
-                      
-                      _buildMenuItem(context, Icons.visibility, "Ver resultados", () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(parentContext).showSnackBar(
-                          const SnackBar(content: Text("Navegando a resultados...")),
-                        );
-                      }),
+                      _buildMenuItem(
+                        context,
+                        Icons.home,
+                        "Volver al menú principal",
+                        () {
+                          Navigator.pop(context);
+                          Navigator.popUntil(
+                            parentContext,
+                            (route) => route.isFirst,
+                          );
+                        },
+                      ),
+                      _buildMenuItem(
+                        context,
+                        Icons.camera_alt,
+                        "Tipo de captura",
+                        () {
+                          Navigator.pop(context);
+                          TipoCapturaPopup.show(parentContext);
+                        },
+                      ),
+
+                      _buildMenuItem(
+                        context,
+                        Icons.add_circle,
+                        "Ingresar resultados",
+                        () async {
+                          Navigator.pop(context);
+                          showDialog(
+                            context: context,
+                            builder: (_) => AnalisisWizardPopup(),
+                          );
+                        },
+                      ),
+
+                      _buildMenuItem(
+                        context,
+                        Icons.visibility,
+                        "Ver resultados",
+                        () {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(parentContext).showSnackBar(
+                            const SnackBar(
+                              content: Text("Navegando a resultados..."),
+                            ),
+                          );
+                        },
+                      ),
                       // Separador
                       Container(
                         height: 1,
                         color: Colors.white.withOpacity(0.2),
                         margin: const EdgeInsets.all(8),
                       ),
-                      _buildMenuItem(context, Icons.logout, "Cerrar Sesión", () {
-                        Navigator.pop(context);
-                        _showLogoutDialog(parentContext);
-                      }, isRed: true),
+                      _buildMenuItem(
+                        context,
+                        Icons.logout,
+                        "Cerrar Sesión",
+                        () {
+                          Navigator.pop(context);
+                          _showLogoutDialog(parentContext);
+                        },
+                        isRed: true,
+                      ),
                       const SizedBox(height: 8),
                     ],
                   ),
@@ -151,26 +198,25 @@ class CustomAppBar {
   }
 
   // Widget para cada opción del menú
-  static Widget _buildMenuItem(BuildContext context, IconData icon, String title, VoidCallback onTap, {bool isRed = false}) {
+  static Widget _buildMenuItem(
+    BuildContext context,
+    IconData icon,
+    String title,
+    VoidCallback onTap, {
+    bool isRed = false,
+  }) {
     return InkWell(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 20,
-            ),
+            Icon(icon, color: Colors.white, size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 title,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 14),
               ),
             ),
           ],
@@ -178,8 +224,6 @@ class CustomAppBar {
       ),
     );
   }
-
-  
 
   // Diálogo para logout
   static void _showLogoutDialog(BuildContext context) {
@@ -205,36 +249,3 @@ class CustomAppBar {
     );
   }
 }
-
-/*
- * ✅ SOLUCIÓN AL PROBLEMA DE RESET:
- * 
- * CAMBIOS PRINCIPALES:
- * 1. Agregamos parámetro opcional `onReset` al buildAppBar()
- * 2. Pasamos este callback a través de todas las funciones
- * 3. En _showResetDialog() ahora tenemos 2 opciones:
- *    - Si hay callback personalizado: lo ejecuta
- *    - Si no hay callback: recarga la página actual
- * 
- * CÓMO USAR EN TUS PÁGINAS:
- * 
- * // Opción A: Con callback personalizado
- * CustomAppBar.buildAppBar(
- *   context, 
- *   "Mi Página",
- *   onReset: () {
- *     setState(() {
- *       // Aquí reinicias tus variables
- *       miVariable = valorInicial;
- *       otroValor = 0;
- *       lista.clear();
- *     });
- *   }
- * )
- * 
- * // Opción B: Sin callback (recarga automática)
- * CustomAppBar.buildAppBar(context, "Mi Página")
- * 
- * La opción B recargará completamente la página, 
- * lo que debería resetear todos los valores.
- */
