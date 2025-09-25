@@ -27,32 +27,7 @@ class _AnalisisWizardPopupState extends State<AnalisisWizardPopup>
   late Animation<double> _fadeAnimation;
   
   // Datos de análisis (lo mismo que tienes en popup_analisi)
-  final List<Map<String, dynamic>> _analisisOpciones = [
-    {
-      'id': 1,
-      'nombre': 'Virus',
-      'color': const Color(0xFF8BC34A),
-      'icon': Icons.coronavirus,
-    },
-    {
-      'id': 2, 
-      'nombre': 'Nematodos',
-      'color': const Color(0xFF00BCD4),
-      'icon': Icons.bug_report,
-    },
-    {
-      'id': 3,
-      'nombre': 'Hongos',
-      'color': const Color(0xFFFF5722),
-      'icon': Icons.grass,
-    },
-    {
-      'id': 4,
-      'nombre': 'Bacteriología',
-      'color': const Color(0xFFFFC107),
-      'icon': Icons.biotech,
-    },
-  ];
+  final List<Map<String, dynamic>> _analisisOpciones = SistemaDatos.getAnalisisComoMapa();
   
   @override
   void initState() {

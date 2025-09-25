@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'popup_tipoCapptura.dart';
 import 'popup_analisis_wizard.dart';
+import 'tablas/popup_tablas.dart';
 
 class CustomAppBar {
   // Método estático para crear el AppBar con popup
@@ -162,10 +163,9 @@ class CustomAppBar {
                         "Ver resultados",
                         () {
                           Navigator.pop(context);
-                          ScaffoldMessenger.of(parentContext).showSnackBar(
-                            const SnackBar(
-                              content: Text("Navegando a resultados..."),
-                            ),
+                          showDialog(
+                            context: parentContext,
+                            builder: (_) => const SelectorAnalisisPopup(),
                           );
                         },
                       ),

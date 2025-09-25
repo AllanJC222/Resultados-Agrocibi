@@ -4,7 +4,11 @@ import 'resultados_nematodos.dart';
 import 'resultados_hongos.dart';
 import 'resultados_bacteorologia.dart';
 import 'sistema_datos.dart';
-import 'main.dart'; // Importa la clase Metodo
+import 'main.dart';
+import 'tablas/tabla_virus.dart';
+import 'tablas/tabla_nematodos.dart';
+import 'tablas/tabla_hongos.dart';
+import 'tablas/tabla_bacterias.dart';
 
 // Definición de nombres de rutas para evitar errores de escritura
 class AppRoutes {
@@ -12,6 +16,11 @@ class AppRoutes {
   static const String resultadosNematodos = '/resultados-nematodos';
   static const String resultadosHongos = '/resultados-hongos';
   static const String resultadosBacteriologia = '/resultados-bacteriologia';
+
+  static const String tablaVirus = '/tabla-virus';
+  static const String tablaNematodos = '/tabla-nematodos';  
+  static const String tablaHongos = '/tabla-hongos';
+  static const String tablaBacteriologia = '/tabla-bacteriologia';
 }
 
 // Lógica de generación de rutas
@@ -55,11 +64,32 @@ class RouteGenerator {
         }
         return _errorRoute();
 
+      case AppRoutes.tablaVirus:
+  return MaterialPageRoute(
+    builder: (_) => const TablaResultadosVirus(),
+  );
+
+case AppRoutes.tablaNematodos:
+  return MaterialPageRoute(
+    builder: (_) => TablaResultadosNematodos(),
+  );
+
+case AppRoutes.tablaHongos:
+  return MaterialPageRoute(
+    builder: (_) => TablaResultadosHongos(),
+  );
+
+case AppRoutes.tablaBacteriologia:
+  return MaterialPageRoute(
+    builder: (_) => TablaResultadosBacteriologia(),
+  );
       default:
         // Manejo de error para rutas no definidas
         return _errorRoute();
     }
   }
+
+  
 
   static Route<dynamic> _errorRoute() {
     return MaterialPageRoute(
