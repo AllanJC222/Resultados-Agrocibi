@@ -9,6 +9,9 @@ import 'tablas/tabla_virus.dart';
 import 'tablas/tabla_nematodos.dart';
 import 'tablas/tabla_hongos.dart';
 import 'tablas/tabla_bacterias.dart';
+import 'almacen-envio/envios.dart';
+import 'almacen-envio/recepcion.dart';
+import 'almacen-envio/almacen_muestras.dart';
 
 // Definición de nombres de rutas para evitar errores de escritura
 class AppRoutes {
@@ -18,9 +21,14 @@ class AppRoutes {
   static const String resultadosBacteriologia = '/resultados-bacteriologia';
 
   static const String tablaVirus = '/tabla-virus';
-  static const String tablaNematodos = '/tabla-nematodos';  
+  static const String tablaNematodos = '/tabla-nematodos';
   static const String tablaHongos = '/tabla-hongos';
   static const String tablaBacteriologia = '/tabla-bacteriologia';
+  static const String envio = '/envio-muestra';
+  static const String recepcion = '/recepcion-muestra';
+  static const String almacen = '/almacen';
+
+
 }
 
 // Lógica de generación de rutas
@@ -65,31 +73,29 @@ class RouteGenerator {
         return _errorRoute();
 
       case AppRoutes.tablaVirus:
-  return MaterialPageRoute(
-    builder: (_) => const TablaResultadosVirus(),
-  );
+        return MaterialPageRoute(builder: (_) => TablaResultadosVirus());
 
-case AppRoutes.tablaNematodos:
-  return MaterialPageRoute(
-    builder: (_) => TablaResultadosNematodos(),
-  );
+      case AppRoutes.tablaNematodos:
+        return MaterialPageRoute(builder: (_) => TablaResultadosNematodos());
 
-case AppRoutes.tablaHongos:
-  return MaterialPageRoute(
-    builder: (_) => TablaResultadosHongos(),
-  );
+      case AppRoutes.tablaHongos:
+        return MaterialPageRoute(builder: (_) => TablaResultadosHongos());
 
-case AppRoutes.tablaBacteriologia:
-  return MaterialPageRoute(
-    builder: (_) => TablaResultadosBacteriologia(),
-  );
+      case AppRoutes.tablaBacteriologia:
+        return MaterialPageRoute(
+          builder: (_) => TablaResultadosBacteriologia(),
+        );
+      case AppRoutes.envio:
+        return MaterialPageRoute(builder: (_) => AlmacenEnvioView());
+      
+      case AppRoutes.recepcion:
+        return MaterialPageRoute(builder: (_) => AlmacenRecepcionView());
+      case AppRoutes.almacen:
+        return MaterialPageRoute(builder: (_) => ListaAlmacenView());
       default:
         // Manejo de error para rutas no definidas
         return _errorRoute();
-    }
-  }
-
-  
+    }  }
 
   static Route<dynamic> _errorRoute() {
     return MaterialPageRoute(

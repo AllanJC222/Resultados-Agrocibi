@@ -1,21 +1,19 @@
-// tabla_resultados_hongos.dart
+// tablas/tabla_hongos.dart
 import 'package:flutter/material.dart';
 import 'tabla_base.dart';
 
-/// Tabla de resultados específica para análisis de Hongos
-/// Campos específicos: Presencia (tejido), Conteo UFC/g (suelo)
-class TablaResultadosHongos extends TablaResultadosBase {
-  const TablaResultadosHongos({super.key}) : super(idAnalisis: 3);
+class TablaResultadosHongos extends StatefulWidget {
+  const TablaResultadosHongos({super.key});
   
   @override
   State<TablaResultadosHongos> createState() => _TablaResultadosHongosState();
 }
 
-class _TablaResultadosHongosState extends TablaResultadosBaseState<TablaResultadosHongos> {
+class _TablaResultadosHongosState extends State<TablaResultadosHongos> 
+    with TablaResultadosMixin {
   
-  // ========================================
-  // IMPLEMENTACIÓN DE MÉTODOS ABSTRACTOS
-  // ========================================
+  @override
+  int get idAnalisis => 3;
   
   @override
   List<DataColumn> buildColumnasEspecificas() {
@@ -50,109 +48,26 @@ class _TablaResultadosHongosState extends TablaResultadosBaseState<TablaResultad
   @override
   DataRow buildFilaEspecifica(Map<String, dynamic> resultado, int index) {
     return DataRow(
-      // Alternar color de filas
       color: MaterialStateProperty.resolveWith<Color?>(
         (Set<MaterialState> states) {
           return index.isEven ? Colors.grey.shade50 : Colors.white;
         },
       ),
       cells: [
-        // ========================================
-        // CELDAS COMUNES
-        // ========================================
-        
-        // Código de muestra
-        DataCell(
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              resultado['codigoMuestra'] ?? '',
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ),
-        
-        // Tipo de muestra con chip
-        DataCell(
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Chip(
-              label: Text(
-                resultado['tipoMuestra'] ?? '',
-                style: const TextStyle(fontSize: 12),
-              ),
-              backgroundColor: _getTipoMuestraColor(resultado['tipoMuestra']),
-              side: BorderSide.none,
-            ),
-          ),
-        ),
-        
-        // Método
+        ...buildCeldasComunes(resultado, index),
+        DataCell(buildCeldaPresencia(resultado['presencia'])),
+        DataCell(_buildCeldaConteo(resultado)),
+        DataCell(_buildCeldaNivel(resultado)),
         DataCell(
           Text(
-            resultado['metodo'] ?? '',
-            style: const TextStyle(fontSize: 14),
+            formatearFecha(resultado['fecha']),
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
           ),
         ),
-        
-        // Variante con estilo
-        DataCell(
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: colorAnalisis.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              resultado['variante'] ?? '',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: colorAnalisis,
-              ),
-            ),
-          ),
-        ),
-        
-        // ========================================
-        // CELDAS ESPECÍFICAS DE HONGOS
-        // ========================================
-        
-        // Presencia (principalmente para tejido)
-        DataCell(
-          buildCeldaPresencia(resultado['presencia']),
-        ),
-        
-        // Conteo UFC/g (principalmente para suelo)
-        DataCell(
-          _buildCeldaConteo(resultado),
-        ),
-        
-        // Nivel de riesgo basado en conteo o presencia
-        DataCell(
-          _buildCeldaNivel(resultado),
-        ),
-        
-        // Fecha formateada
-        DataCell(
-          Text(
-            _formatearFecha(resultado['fecha']),
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey.shade700,
-            ),
-          ),
-        ),
-        
-        // Acciones
         DataCell(
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Botón eliminar (sin acción)
               buildBotonEliminar(resultado),
             ],
           ),
@@ -161,33 +76,27 @@ class _TablaResultadosHongosState extends TablaResultadosBaseState<TablaResultad
     );
   }
   
-  // ========================================
-  // MÉTODOS HELPER ESPECÍFICOS DE HONGOS
-  // ========================================
+  @override
+  Widget build(BuildContext context) => buildScaffold(context);
   
-  /// Construye celda de conteo UFC/g con formato
   Widget _buildCeldaConteo(Map<String, dynamic> resultado) {
     final conteo = resultado['conteo'];
     
     if (conteo == null) {
-      return Text(
-        '-',
-        style: TextStyle(color: Colors.grey.shade500),
-      );
+      return Text('-', style: TextStyle(color: Colors.grey.shade500));
     }
     
     int conteoInt = conteo is int ? conteo : int.tryParse(conteo.toString()) ?? 0;
     
-    // Determinar color según nivel de conteo
     Color colorConteo;
     if (conteoInt == 0) {
-      colorConteo = Colors.green.shade700; // Sin hongos
+      colorConteo = Colors.green.shade700;
     } else if (conteoInt < 100) {
-      colorConteo = Colors.orange.shade700; // Bajo
+      colorConteo = Colors.orange.shade700;
     } else if (conteoInt < 500) {
-      colorConteo = Colors.red.shade600; // Medio
+      colorConteo = Colors.red.shade600;
     } else {
-      colorConteo = Colors.red.shade800; // Alto
+      colorConteo = Colors.red.shade800;
     }
     
     return Text(
@@ -200,7 +109,6 @@ class _TablaResultadosHongosState extends TablaResultadosBaseState<TablaResultad
     );
   }
   
-  /// Construye celda de nivel de riesgo
   Widget _buildCeldaNivel(Map<String, dynamic> resultado) {
     final presencia = resultado['presencia'];
     final conteo = resultado['conteo'];
@@ -211,7 +119,6 @@ class _TablaResultadosHongosState extends TablaResultadosBaseState<TablaResultad
     IconData icono;
     
     if (tipoMuestra.contains('tejido')) {
-      // Para tejido, usar presencia
       if (presencia == true) {
         nivel = 'Positivo';
         colorNivel = Colors.red;
@@ -226,7 +133,6 @@ class _TablaResultadosHongosState extends TablaResultadosBaseState<TablaResultad
         icono = Icons.help_outline;
       }
     } else {
-      // Para suelo, usar conteo
       int conteoInt = conteo is int ? conteo : int.tryParse(conteo.toString()) ?? 0;
       
       if (conteoInt == 0) {
@@ -271,32 +177,5 @@ class _TablaResultadosHongosState extends TablaResultadosBaseState<TablaResultad
         ],
       ),
     );
-  }
-  
-  /// Obtiene color para chip de tipo de muestra
-  Color _getTipoMuestraColor(String? tipo) {
-    switch (tipo?.toLowerCase()) {
-      case 'tejido foliar':
-        return Colors.green.shade100;
-      case 'suelo':
-        return Colors.brown.shade100;
-      default:
-        return Colors.grey.shade100;
-    }
-  }
-  
-  /// Formatea fecha para mostrar
-  String _formatearFecha(dynamic fecha) {
-    if (fecha == null) return '-';
-    
-    String fechaStr = fecha.toString();
-    try {
-      DateTime fechaDateTime = DateTime.parse(fechaStr);
-      return '${fechaDateTime.day.toString().padLeft(2, '0')}/'
-             '${fechaDateTime.month.toString().padLeft(2, '0')}/'
-             '${fechaDateTime.year}';
-    } catch (e) {
-      return fechaStr;
-    }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prueba_flutter/route.dart';
 import 'popup_tipoCapptura.dart';
 import 'popup_analisis_wizard.dart';
 import 'tablas/popup_tablas.dart';
@@ -138,7 +139,7 @@ class CustomAppBar {
                         context,
                         Icons.camera_alt,
                         "Tipo de captura",
-                        () {
+                        () async {
                           Navigator.pop(context);
                           TipoCapturaPopup.show(parentContext);
                         },
@@ -166,6 +167,47 @@ class CustomAppBar {
                           showDialog(
                             context: parentContext,
                             builder: (_) => const SelectorAnalisisPopup(),
+                          );
+                        },
+                      ),
+                      _buildMenuItem(
+                        context,
+                        Icons.inventory_2,
+                        "ver todas las muestras",
+                        () {
+                          Navigator.pop(context);
+                          Navigator.pushNamed(
+                            // ← CAMBIAR: pushNamed en lugar de push
+                            parentContext,
+                            AppRoutes
+                                .almacen, // ← Solo la ruta, sin MaterialPageRoute
+                          );
+                        },
+                      ),
+                      _buildMenuItem(
+                        context,
+                        Icons.send,
+                        "Reportar en envio",
+                        () {
+                          Navigator.pop(context);
+                          Navigator.pushNamed(
+                            // ← CAMBIAR: pushNamed en lugar de push
+                            parentContext,
+                            AppRoutes
+                                .envio, // ← Solo la ruta, sin MaterialPageRoute
+                          );
+                        },
+                      ),
+                      _buildMenuItem(
+                        context,
+                        Icons.move_to_inbox,
+                        "Reportar en recepcion",
+                        () {
+                          Navigator.pop(context);
+                          Navigator.pushNamed(
+                            parentContext,
+                            AppRoutes
+                                .recepcion, // ← Solo la ruta, sin MaterialPageRoute
                           );
                         },
                       ),

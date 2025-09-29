@@ -1,21 +1,19 @@
-// tabla_resultados_nematodos.dart
+// tablas/tabla_nematodos.dart
 import 'package:flutter/material.dart';
 import 'tabla_base.dart';
 
-/// Tabla de resultados específica para análisis de Nematodos
-/// Campos específicos: Juveniles por gramo (no maneja presencia)
-class TablaResultadosNematodos extends TablaResultadosBase {
-  const TablaResultadosNematodos({super.key}) : super(idAnalisis: 2);
+class TablaResultadosNematodos extends StatefulWidget {
+  const TablaResultadosNematodos({super.key});
   
   @override
   State<TablaResultadosNematodos> createState() => _TablaResultadosNematodosState();
 }
 
-class _TablaResultadosNematodosState extends TablaResultadosBaseState<TablaResultadosNematodos> {
+class _TablaResultadosNematodosState extends State<TablaResultadosNematodos> 
+    with TablaResultadosMixin {
   
-  // ========================================
-  // IMPLEMENTACIÓN DE MÉTODOS ABSTRACTOS
-  // ========================================
+  @override
+  int get idAnalisis => 2;
   
   @override
   List<DataColumn> buildColumnasEspecificas() {
@@ -44,104 +42,25 @@ class _TablaResultadosNematodosState extends TablaResultadosBaseState<TablaResul
   @override
   DataRow buildFilaEspecifica(Map<String, dynamic> resultado, int index) {
     return DataRow(
-      // Alternar color de filas
       color: MaterialStateProperty.resolveWith<Color?>(
         (Set<MaterialState> states) {
           return index.isEven ? Colors.grey.shade50 : Colors.white;
         },
       ),
       cells: [
-        // ========================================
-        // CELDAS COMUNES
-        // ========================================
-        
-        // Código de muestra
-        DataCell(
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              resultado['codigoMuestra'] ?? '',
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ),
-        
-        // Tipo de muestra con chip
-        DataCell(
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Chip(
-              label: Text(
-                resultado['tipoMuestra'] ?? '',
-                style: const TextStyle(fontSize: 12),
-              ),
-              backgroundColor: _getTipoMuestraColor(resultado['tipoMuestra']),
-              side: BorderSide.none,
-            ),
-          ),
-        ),
-        
-        // Método
+        ...buildCeldasComunes(resultado, index),
+        DataCell(_buildCeldaJuveniles(resultado)),
+        DataCell(_buildCeldaNivel(resultado)),
         DataCell(
           Text(
-            resultado['metodo'] ?? '',
-            style: const TextStyle(fontSize: 14),
+            formatearFecha(resultado['fecha']),
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
           ),
         ),
-        
-        // Variante con estilo
-        DataCell(
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: colorAnalisis.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              resultado['variante'] ?? '',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: colorAnalisis,
-              ),
-            ),
-          ),
-        ),
-        
-        // ========================================
-        // CELDAS ESPECÍFICAS DE NEMATODOS
-        // ========================================
-        
-        // Juveniles por gramo con formato y color
-        DataCell(
-          _buildCeldaJuveniles(resultado),
-        ),
-        
-        // Nivel de infestación basado en juveniles
-        DataCell(
-          _buildCeldaNivel(resultado),
-        ),
-        
-        // Fecha formateada
-        DataCell(
-          Text(
-            _formatearFecha(resultado['fecha']),
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey.shade700,
-            ),
-          ),
-        ),
-        
-        // Acciones
         DataCell(
           Row(
             mainAxisSize: MainAxisSize.min,
-            children: [            
-              // Botón eliminar (sin acción)
+            children: [
               buildBotonEliminar(resultado),
             ],
           ),
@@ -150,33 +69,27 @@ class _TablaResultadosNematodosState extends TablaResultadosBaseState<TablaResul
     );
   }
   
-  // ========================================
-  // MÉTODOS HELPER ESPECÍFICOS DE NEMATODOS
-  // ========================================
+  @override
+  Widget build(BuildContext context) => buildScaffold(context);
   
-  /// Construye celda de juveniles con formato y color
   Widget _buildCeldaJuveniles(Map<String, dynamic> resultado) {
     final juveniles = resultado['juveniles'];
     
     if (juveniles == null) {
-      return Text(
-        '-',
-        style: TextStyle(color: Colors.grey.shade500),
-      );
+      return Text('-', style: TextStyle(color: Colors.grey.shade500));
     }
     
     int juvenilesInt = juveniles is int ? juveniles : int.tryParse(juveniles.toString()) ?? 0;
     
-    // Determinar color según nivel de juveniles
     Color colorJuveniles;
     if (juvenilesInt == 0) {
-      colorJuveniles = Colors.green.shade700; // Sin nematodos
+      colorJuveniles = Colors.green.shade700;
     } else if (juvenilesInt < 20) {
-      colorJuveniles = Colors.orange.shade700; // Bajo
+      colorJuveniles = Colors.orange.shade700;
     } else if (juvenilesInt < 50) {
-      colorJuveniles = Colors.red.shade600; // Medio
+      colorJuveniles = Colors.red.shade600;
     } else {
-      colorJuveniles = Colors.red.shade800; // Alto
+      colorJuveniles = Colors.red.shade800;
     }
     
     return Text(
@@ -189,7 +102,6 @@ class _TablaResultadosNematodosState extends TablaResultadosBaseState<TablaResul
     );
   }
   
-  /// Construye celda de nivel de infestación
   Widget _buildCeldaNivel(Map<String, dynamic> resultado) {
     final juveniles = resultado['juveniles'];
     
@@ -244,32 +156,5 @@ class _TablaResultadosNematodosState extends TablaResultadosBaseState<TablaResul
         ],
       ),
     );
-  }
-  
-  /// Obtiene color para chip de tipo de muestra
-  Color _getTipoMuestraColor(String? tipo) {
-    switch (tipo?.toLowerCase()) {
-      case 'tejido foliar':
-        return Colors.green.shade100;
-      case 'suelo':
-        return Colors.brown.shade100;
-      default:
-        return Colors.grey.shade100;
-    }
-  }
-  
-  /// Formatea fecha para mostrar
-  String _formatearFecha(dynamic fecha) {
-    if (fecha == null) return '-';
-    
-    String fechaStr = fecha.toString();
-    try {
-      DateTime fechaDateTime = DateTime.parse(fechaStr);
-      return '${fechaDateTime.day.toString().padLeft(2, '0')}/'
-             '${fechaDateTime.month.toString().padLeft(2, '0')}/'
-             '${fechaDateTime.year}';
-    } catch (e) {
-      return fechaStr;
-    }
   }
 }

@@ -5,8 +5,6 @@ import 'app_bar.dart';
 import 'popup_analisis_wizard.dart';
 import 'route.dart'; // Importa el archivo de rutas
 
-
-
 class AppColors {
   static const Color primary = Color.fromRGBO(233, 99, 43, 1);
   static const Color secondary = Color.fromRGBO(243, 202, 11, 1);
