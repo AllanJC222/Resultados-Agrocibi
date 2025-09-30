@@ -225,8 +225,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  /// Construye una tabla de variantes con checkboxes para presencia/ausencia
-  /// Parámetros: título, lista de variantes, color de tema
+  // Construye una tabla de variantes con checkboxes para presencia/ausencia
+  // Parámetros: título, lista de variantes, color de tema
   Widget _buildVariantTable({
     required String title,
     required List<Map<String, dynamic>> variants,

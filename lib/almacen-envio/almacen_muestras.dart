@@ -209,25 +209,41 @@ class _ListaAlmacenViewState extends State<ListaAlmacenView> {
 
   /// Fila individual de muestra - card simple con botón detalles
   Widget _buildFilaMuestra(Map<String, dynamic> muestra) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: _getColorEstado(muestra),
-          child: Text(
-            muestra['codigo'].toString().split('-').last,
-            style: const TextStyle(color: Colors.white, fontSize: 12),
-          ),
-        ),
-        title: Text('${muestra['codigo']} - ${muestra['tipo']}'),
-        subtitle: Text('${muestra['finca']} | ${muestra['lote']}'),
-        trailing: IconButton(
-          icon: Icon(Icons.info_outline, color: accentColor),
-          onPressed: () => _verDetalles(muestra),
+  return Card(
+    margin: const EdgeInsets.only(bottom: 8),
+    child: ListTile(
+      leading: CircleAvatar(
+        backgroundColor: _getColorEstado(muestra),
+        child: Text(
+          muestra['codigo'].toString().split('-').last,
+          style: const TextStyle(color: Colors.white, fontSize: 12),
         ),
       ),
-    );
-  }
+      title: Text('${muestra['codigo']} - ${muestra['tipo']}'),
+      subtitle: Text('${muestra['finca']} | ${muestra['lote']}'),
+      
+      // 🎯 AQUÍ ESTÁ EL CAMBIO - trailing ahora es una Row con 2 botones
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min, // ← IMPORTANTE: que solo ocupe lo necesario
+        children: [
+          // Botón de info (el que ya tenías)
+          IconButton(
+            icon: Icon(Icons.info_outline, color: accentColor),
+            onPressed: () => _verDetalles(muestra),
+            tooltip: 'Ver detalles',
+          ),
+          
+          // Botón de eliminar (nuevo)
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+            onPressed: () => _verDetalles(muestra), // ← llamamos el popup
+            tooltip: 'Eliminar muestra',
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   /// Color según estado de envío
   Color _getColorEstado(Map<String, dynamic> muestra) {

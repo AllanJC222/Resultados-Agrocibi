@@ -394,68 +394,7 @@ class AlmacenTableRowHelper {
       style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
     );
   }
-
-  /// Helper para construir celdas con chip
-  static Widget buildChipCell(String text, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 12,
-          color: Colors.white,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
-  /// Helper para construir celda de fecha con estado
-  static Widget buildDateStatusCell(
-    String? fecha, {
-    String pendingText = 'Pendiente',
-    Color? pendingColor,
-    Color? completedColor,
-  }) {
-    if (fecha == null) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: (pendingColor ?? Colors.orange.shade100),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          pendingText,
-          style: TextStyle(
-            fontSize: 12,
-            color: (pendingColor ?? Colors.orange.shade700),
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: (completedColor ?? Colors.green.shade100),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        fecha,
-        style: TextStyle(
-          fontSize: 12,
-          color: (completedColor ?? Colors.green.shade700),
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
+  
   /// Helper para construir header de columna
   static Widget buildColumnHeader(String text, {Color? color}) {
     return Text(
